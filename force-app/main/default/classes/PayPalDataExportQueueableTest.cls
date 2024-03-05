@@ -11,7 +11,7 @@ public class PayPalDataExportQueueableTest {
             HttpResponse response = new HttpResponse();
             response.setHeader('Content-Type', 'application/json');
             response.setBody(
-                [SELECT Body FROM StaticResource WHERE Name = 'Paypal_Transaction_Data' ].Body.toString()
+                [SELECT Body FROM StaticResource WHERE Name = 'Paypal_Transaction_Data' AND NamespacePrefix = null].Body.toString()
             );
             if (statusCode != 200) {
                 response.setBody('"Wrong": "Wrong"');

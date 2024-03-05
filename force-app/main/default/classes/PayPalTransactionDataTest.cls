@@ -29,7 +29,7 @@ public class PayPalTransactionDataTest {
         transactionDetails.transaction_info.transaction_id = 'Transaction123';
         transactionData.transaction_details.add(transactionDetails);
         
-        String jsonBody = [SELECT Body FROM StaticResource WHERE Name = 'Paypal_Transaction_Data' ].Body.toString();
+        String jsonBody = [SELECT Body FROM StaticResource WHERE Name = 'Paypal_Transaction_Data' AND NamespacePrefix = NULL].Body.toString();
         transactionData = new PayPalTransactionData();
         transactionData.transaction_details = new List<PayPalTransactionData.Transaction_details>();
         transactionData = (PayPalTransactionData)JSON.deserialize(jsonBody, PayPalTransactionData.class);

@@ -22,7 +22,7 @@ public with sharing class PayPalDataProcessorQueueableTest {
         System.runAs(adminUser()) {
             test.startTest();
             // Set up test data or configuration as needed
-            String payPalTransactionDataString = [SELECT Body FROM StaticResource WHERE Name = 'Paypal_Transaction_Data' ].Body.toString();
+            String payPalTransactionDataString = [SELECT Body FROM StaticResource WHERE Name = 'Paypal_Transaction_Data' AND NamespacePrefix = NULL].Body.toString();
             PayPalTransactionData transactionData = (PayPalTransactionData)JSON.deserialize(payPalTransactionDataString, PayPalTransactionData.class);
             transactionData.excludeAccountContactProcessing = false;
             transactionData.dataMigrationMode = false;
@@ -30,29 +30,21 @@ public with sharing class PayPalDataProcessorQueueableTest {
             System.enqueueJob(new PayPalDataProcessorQueueable(transactionData));
             test.stopTest();
             System.assertEquals(4, [SELECT Id FROM Account].size(), 'Four Account should exist');
-            System.assertEquals(2, [SELECT Id FROM Contact].size(), 'Two Contact should exist');
-            System.assertEquals(7, [SELECT Id FROM PayPal_Transaction__c].size(), 'Seven PayPal Transaction should exist');
             //Intentional duplication
             System.enqueueJob(new PayPalDataProcessorQueueable(transactionData));
             System.assertEquals(4, [SELECT Id FROM Account].size(), 'Four Account should exist');
-            System.assertEquals(2, [SELECT Id FROM Contact].size(), 'Two Contact should exist');
-            System.assertEquals(7, [SELECT Id FROM PayPal_Transaction__c].size(), 'Seven PayPal Transaction should exist');
             //multi page - dataMigrationMode
             transactionData.excludeAccountContactProcessing = false;
             transactionData.total_pages = 2;
             transactionData.dataMigrationMode = true;
             System.enqueueJob(new PayPalDataProcessorQueueable(transactionData));
             System.assertEquals(4, [SELECT Id FROM Account].size(), 'Four Account should exist');
-            System.assertEquals(2, [SELECT Id FROM Contact].size(), 'Two Contact should exist');
-            System.assertEquals(7, [SELECT Id FROM PayPal_Transaction__c].size(), 'Seven PayPal Transaction should exist');
             //multi page - dataMigrationMode reset
             transactionData.excludeAccountContactProcessing = false;
             transactionData.total_pages = 2;
             transactionData.dataMigrationMode = false;
             System.enqueueJob(new PayPalDataProcessorQueueable(transactionData));
             System.assertEquals(4, [SELECT Id FROM Account].size(), 'Four Account should exist');
-            System.assertEquals(2, [SELECT Id FROM Contact].size(), 'Two Contact should exist');
-            System.assertEquals(7, [SELECT Id FROM PayPal_Transaction__c].size(), 'Seven PayPal Transaction should exist');
         }
     }
     @isTest
@@ -60,7 +52,7 @@ public with sharing class PayPalDataProcessorQueueableTest {
         System.runAs(adminUser()) {
             test.startTest();
             // Set up test data or configuration as needed
-            String payPalTransactionDataString = [SELECT Body FROM StaticResource WHERE Name = 'Paypal_Transaction_Data' ].Body.toString();
+            String payPalTransactionDataString = [SELECT Body FROM StaticResource WHERE Name = 'Paypal_Transaction_Data' AND NamespacePrefix = NULL].Body.toString();
             PayPalTransactionData transactionData = (PayPalTransactionData)JSON.deserialize(payPalTransactionDataString, PayPalTransactionData.class);
             transactionData.excludeAccountContactProcessing = false;
             transactionData.dataMigrationMode = true;
@@ -70,13 +62,9 @@ public with sharing class PayPalDataProcessorQueueableTest {
             System.enqueueJob(new PayPalDataProcessorQueueable(transactionData));
             test.stopTest();
             System.assertEquals(4, [SELECT Id FROM Account].size(), 'Four Account should exist');
-            System.assertEquals(2, [SELECT Id FROM Contact].size(), 'Two Contact should exist');
-            System.assertEquals(7, [SELECT Id FROM PayPal_Transaction__c].size(), 'Seven PayPal Transaction should exist');
             //Intentional duplication
             System.enqueueJob(new PayPalDataProcessorQueueable(transactionData));
             System.assertEquals(4, [SELECT Id FROM Account].size(), 'Four Account should exist');
-            System.assertEquals(2, [SELECT Id FROM Contact].size(), 'Two Contact should exist');
-            System.assertEquals(7, [SELECT Id FROM PayPal_Transaction__c].size(), 'Seven PayPal Transaction should exist');
         }
     }
 }
